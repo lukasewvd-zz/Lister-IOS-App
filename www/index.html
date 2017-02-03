@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+    <script type="text/javascript" src="lib/localforage/dist/localforage.min.js"></script>
+    <script type="text/javascript" src="lib/angular-localForage/dist/angular-localForage.min.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/controllers.js"></script>
+    <script src="js/app.js"></script>
+  </head>
+  <body ng-app="todo">
+    <ion-pane ng-controller="IndexCtrl">
+      <ion-header-bar class="bar-positive">
+        <h1 class="title">Lister</h1>
+        <button ng-click="showTaskPrompt();" class="button button-icon icon ion-ios7-plus"></button>
+      </ion-header-bar>
+
+      <ion-tabs class="tabs-background-assertive tabs-icon-top">
+        <ion-tab title="Tasks" icon="ion-ios7-paper">
+          <ion-content>
+            <div class="content padding" ng-show="items.length === 0">
+                <center><h4>All tasks completed!</h4></center>
+            </div>
+                
+            <ion-list can-swipe="true" show-delete="false">
+              <ion-item ng-repeat="item in items">
+                <h2>{{item.title}}</h2>
+                <p style="white-space:normal;">{{item.description}}</p>
+                <ion-option-button class="button-balanced ion-thumbsup" ng-click="completeItem(item)">
+                  <br>Done
+                </ion-option-button>
+
+                <ion-option-button class="button-assertive ion-android-trash" ng-click="ignoreItem(item)">
+                  <br>Delete
+                </ion-option-button>                
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ion-tab>
+
+        <ion-tab title="Stats" icon="ion-stats-bars">
+          <ion-content>    
+            <div class="list">
+
+              <a class="item item-icon-left">
+                <i class="icon ion-ios7-pulse"></i>
+                Active Tasks
+                <span class="badge badge-assertive">{{items.length}}</span>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-thumbsup"></i>
+                Completed Tasks
+                <span class="badge badge-assertive">{{itemsAdd}}</span>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-ios7-trash-outline"></i>
+                Deleted Tasks
+                <span class="badge badge-assertive">{{itemsDel}}</span>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-ios7-compose-outline"></i>
+                Created Tasks
+                <span class="badge badge-assertive">{{itemsCre}}</span>
+              </a>
+              <div class="col"><button ng-click="clearStats()" class="button button-block button-outline icon-left ion-close-circled button-assertive">Clear</button></div>
+              <center><h6>Note: You can not regret this action!</h6></center>
+            </div>
+          </ion-content>
+        </ion-tab>
+        
+        <ion-tab title="Achivments" icon="ion-trophy">
+          <ion-content>    
+            <div class="list">
+              <a class="item item-icon-left">
+                <i class="icon ion-android-lightbulb"></i>
+                <h4>Here we go:</h4>
+                <p>Add your first task: {{firstAdd}}/1 </p>
+                <progress max="1" value="{{firstAdd}}"></progress>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-heart-broken"></i>
+                <h4>Hartbroken:</h4>
+                <p>Delete your first task: {{firstDel}}/1 </p>
+                <progress max="1" value="{{firstDel}}"></progress>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-clock"></i>
+                <h4>So much to do, so little time:</h4>
+                <p>Have 10 active tasks: {{tenActive}}/10 </p>
+                <progress max="10" value="{{tenActive}}"></progress>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-hammer"></i>
+                <h4>Creator:</h4>
+                <p>Create 100 tasks: {{hundredCre}}/100 </p>
+                <progress max="100" value="{{hundredCre}}"></progress>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-social-freebsd-devil"></i>
+                <h4>Destroyer:</h4>
+                <p>Delete 100 tasks: {{hundredDel}}/100 </p>
+                <progress max="100" value="{{hundredDel}}"></progress>
+              </a>
+              <a class="item item-icon-left">
+                <i class="icon ion-beer"></i>
+                <h4>Mission accomplished:</h4>
+                <p>Complete 100 tasks: {{hundredClmp}}/100 </p>
+                <progress max="100" value="{{hundredClmp}}"></progress>
+              </a>
+              <div class="col"><button ng-click="clearAchi()" class="button button-block button-outline icon-left ion-close-circled button-assertive">Reset</button></div>
+              <center><h6>Note: You can not regret this action!</h6></center>
+            </div>
+          </ion-content>
+        </ion-tab>
+      </ion-tabs>
+    </ion-pane>
+    
+    
+
+    <script id="task-prompt.html" type="text/ng-template">
+      <ion-modal-view>
+        <ion-header-bar class="bar-danger">
+          <h1 class="title">Add New Task</h1>
+        </ion-header-bar>
+        <ion-content>
+          <div class="list">
+            <label class="item item-input">
+              <input type="text" placeholder="Task title" ng-model="newTask.title">
+            </label>
+            <label class="item item-input">
+              <textarea placeholder="Task description" ng-model="newTask.description" ROWS=5></textarea>
+            </label>
+          </div>
+
+          <div class="row">
+            <div class="col"><button ng-click="saveTask()" class="button button-block button-outline icon-left ion-checkmark-circled button-balanced">Save</button></div>
+            <div class="col"><button ng-click="cancelTask()" class="button button-block button-outline icon-left ion-close-circled button-assertive">Cancel</button></div>
+          </div>
+        </ion-content>
+      </ion-modal-view>
+    </script>
+  </body>
+</html>
